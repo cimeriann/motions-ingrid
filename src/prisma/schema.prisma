@@ -1,84 +1,85 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// model Post {
-//   id        Int      @id @default(autoincrement())
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//   title     String
-//   content   String?
-//   published Boolean  @default(false)
-//   authorId  Int
-//   author    User     @relation(fields: [authorId], references: [id])
-// }
-
-// model Profile {
-//   id     Int     @id @default(autoincrement())
-//   bio    String?
-//   userId Int     @unique
-//   user   User    @relation(fields: [userId], references: [id])
-// }
-
 model User {
-    id             String             @id @default(cuid())
-    email          String             @unique
-    name           String?
-    password       String
-    createdAt      DateTime           @default(now())
-    updatedAt      DateTime           @updatedAt
-    organizations  OrganizationUser[]
-    articles       Article[]
-    knowledgeBases KnowledgeBase[]
+  id                 String             @id @default(cuid())
+  email              String             @unique
+  name               String?
+  password           String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  articles           Article[]
+  lastEditedArticles Article[]          @relation("LastEditedArticles")
+  knowledgeBases     KnowledgeBase[]
+  Organization       Organization[]
+  organizations      OrganizationUser[]
 }
 
 model Organization {
-    id             String             @id @default(uuid())
-    name           String             @unique
-    ownerId        String
-    owner          User               @relation(fields: [ownerId], references: [id])
-    createdAt      DateTime           @default(now())
-    updatedAt      DateTime           @updatedAt
-    members        OrganizationUser[]
-    knowledgeBases KnowledgeBase[]
+  id             String             @id @default(uuid())
+  name           String             @unique
+  ownerId        String
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  knowledgeBases KnowledgeBase[]
+  owner          User               @relation(fields: [ownerId], references: [id])
+  members        OrganizationUser[]
 }
 
 model OrganizationUser {
-    id             String           @id @default(uuid())
-    userId         String
-    user           User             @relation(fields: [userId], references: [id])
-    organizationId String
-    organization   Organization     @relation(fields: [organizationId], references: [id])
-    role           OrganizationRole
-    createdAt      DateTime         @default(now())
-    updatedAt      DateTime         @updatedAt
-}
-
-// the relation fields in the organization user model are used to create a many-to-many relationship between users and organizations
-
-enum OrganizationRole {
-    OWNER
-    ADMIN
-    MEMBER
-    VIEWER
+  id             String           @id @default(uuid())
+  userId         String
+  organizationId String
+  role           OrganizationRole
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  organization   Organization     @relation(fields: [organizationId], references: [id])
+  user           User             @relation(fields: [userId], references: [id])
 }
 
 model KnowledgeBase {
-    id             String       @id @default(uuid())
-    title          String
-    description    String?
-    organizationId String
-    organization   Organization @relation(fields: [organizationId], references: [id])
-    creatorId      String
-    creator        User         @relation(fields: [creatorId], references: [id])
-    access         AccessLevel  @default(PRIVATE) // Public, Private, Organization
-    createdAt      DateTime     @default(now())
-    updatedAt      DateTime     @updatedAt
-    articles       Article[]
+  id             String       @id @default(uuid())
+  title          String
+  description    String?
+  organizationId String
+  creatorId      String
+  access         AccessLevel  @default(PRIVATE)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  articles       Article[]
+  creator        User         @relation(fields: [creatorId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
+model Article {
+  id              String        @id @default(uuid())
+  title           String
+  content         String
+  knowledgeBaseId String
+  creatorId       String
+  lastEditorId    String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  creator         User          @relation(fields: [creatorId], references: [id])
+  knowledgeBase   KnowledgeBase @relation(fields: [knowledgeBaseId], references: [id], onDelete: Cascade)
+  lastEditor      User?         @relation("LastEditedArticles", fields: [lastEditorId], references: [id])
+}
+
+enum OrganizationRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum AccessLevel {
+  PUBLIC
+  PRIVATE
+  ORGANIZATION
+}
