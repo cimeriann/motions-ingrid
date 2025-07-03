@@ -38,7 +38,13 @@ export class UserController {
 	static async updateUser(req: Request, res: Response, next: NextFunction){
 		try {
 			const {id} = req.params;
+			// console.log(req.body)
 			const validatedData = updateUserSchema.parse(req.body);
+
+			if(!validatedData.name && !validatedData.email) {
+				throw new BadRequestError('At least one of name or email must be provided for update');
+			}
+			console.log(validatedData)
 			const user = await userService.updateUser(id, validatedData);
 			res.status(200).json(user);
 		} catch(error) {
