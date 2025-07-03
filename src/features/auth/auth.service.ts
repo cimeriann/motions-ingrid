@@ -1,7 +1,7 @@
+import env from '@config/index';
 import prisma from '@utils/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import env from '@config/index';
 import { UnauthorizedError, NotFoundError } from '@middlewares/errorHandler';
 
 
