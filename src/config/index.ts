@@ -3,7 +3,6 @@ import { z } from 'zod';
 
 dotenv.config();
 
-
 const envSchema = z.object({
 	PORT: z.string().default('3000'),
 	DATABASE_URL: z.string().url(),
@@ -11,5 +10,5 @@ const envSchema = z.object({
 });
 
 const env = envSchema.parse(process.env);
-
+// console.log(env)
 export default env;
