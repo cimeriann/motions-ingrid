@@ -5,10 +5,11 @@ import helmet from 'helmet';
 import { Request, Response, NextFunction } from 'express';
 import userRouter from '@features/users/user.router';
 import authRouter from '@features/auth/auth.router';
+import organizationRouter from '@features/organizations/organization.router';
 import errorHandler from '@middlewares/errorHandler';
-// import { configDotenv } from 'dotenv';
+import { configDotenv } from 'dotenv';
 
-// configDotenv();
+configDotenv();
 
 const app = express();
 
@@ -20,20 +21,18 @@ app.use(helmet());
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 const PORT = env.PORT || 3000;
+const version = env.VERSION;
 
-console.log(PORT)
+// console.log(version);
+
+// console.log(PORT)
 // routes
-// app.use((req, res, next) => {
-// 	console.log("req.body: ", req.body);
-// 	// res.status(200).json({message: 'this works' });
-// 	next();
-// })
-app.use('/api/v1/users', userRouter);
-app.use('/api/v1/auth', authRouter);
-
+app.use(`/api/v${version}/users`, userRouter);
+app.use(`/api/v${version}/auth`, authRouter);
+app.use(`/api/v${version}/organization`, organizationRouter);
 
 app.use((req, res, next) => {
-	console.log("req.body: ", req.body);
+	// console.log("req.body: ", req.body);
 	res.status(404).json({message: 'Route Not Found' });
 })
 app.listen(PORT, () => {
