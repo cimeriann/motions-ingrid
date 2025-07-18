@@ -17,7 +17,6 @@ model User {
   articles           Article[]
   lastEditedArticles Article[]          @relation("LastEditedArticles")
   knowledgeBases     KnowledgeBase[]
-  Organization       Organization[]
   organizations      OrganizationUser[]
 }
 
@@ -28,7 +27,6 @@ model Organization {
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   knowledgeBases KnowledgeBase[]
-  owner          User               @relation(fields: [ownerId], references: [id])
   members        OrganizationUser[]
 }
 
